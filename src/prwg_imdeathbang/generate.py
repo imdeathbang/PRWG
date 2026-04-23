@@ -1,7 +1,7 @@
 import xml.etree.ElementTree as etree
-from data import *
+from src.prwg_imdeathbang.data import *
 import argparse
-import c
+import src.prwg_imdeathbang.c as c
 
 def parse_params(params: list[etree.Element[str]], registered_languages: dict[str, LanguageData]) -> list[Param]:
     parsed: list[Param] = []
