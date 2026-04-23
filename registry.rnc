@@ -1,0 +1,64 @@
+Param = element param {
+    attribute type { text },
+    attribute name { text }
+}
+
+Constructor = element constructor {
+    attribute command { text },
+    Param*,
+    (
+        element out {
+            attribute name { text }
+        },
+        element result {
+            attribute type { text },
+            attribute success { text }
+        }?
+    )?
+}
+
+Destructor = element destructor {
+    attribute name { text },
+    Param*
+}
+
+Property = element property {
+    attribute type { text },
+    attribute name { text },
+    element get {
+        attribute name { text }
+    },
+    element set {
+        attribute name { text }
+    }
+}
+
+Command = element command {
+    attribute type { text },
+    attribute name { text },
+    Param*
+}
+
+Handle = element handle {
+    attribute type { text },
+    attribute name { text },
+    Constructor,
+    Destructor,
+    Property*,
+    Command*
+}
+
+Enumerator = element enumerator {
+    attribute name { text },
+    attribute value { text }
+}
+
+Enum = element enum {
+    attribute name { text },
+    Enumerator+
+}
+
+element registry {
+    Handle+,
+    Enum*
+}

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<registry>
+    <handle type="VlWindow" name="window">
+        <constructor command="vlCreateWindow">
+            <param type="string" name="title"/>
+            <out name="pOutWindow"/>
+        </constructor>
+        <destructor name="vlDestroyWindow"/>
+        <property type="string" name="title">
+            <get name="vlGetWindowWidth"/>
+            <set name="vlSetWindowWidth"/>
+        </property>
+    </handle>
+    <enum name="VlResult">
+        <enumerator name="VL_SUCCESS" value="0"/>
+        <enumerator name="VL_FAIL" value="0"/>
+    </enum>
+</registry>
