@@ -9,3 +9,5 @@ src/prwg.egg-info/dependency_links.txt
 build/lib/prwg_imdeathbang/generate.py
 build/lib/prwg_imdeathbang/data.py
 build/lib/prwg_imdeathbang/c.py
+dist/prwg-0.1.0-py3-none-any.whl
+dist/prwg-0.1.0.tar.gz
