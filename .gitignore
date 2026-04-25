@@ -1,3 +1,11 @@
 /.vscode
 /Git-2.54.0-64-bit.exe
 /__pycache__
+src/prwg.egg-info/top_level.txt
+src/prwg.egg-info/SOURCES.txt
+src/prwg.egg-info/PKG-INFO
+src/prwg.egg-info/entry_points.txt
+src/prwg.egg-info/dependency_links.txt
+build/lib/prwg_imdeathbang/generate.py
+build/lib/prwg_imdeathbang/data.py
+build/lib/prwg_imdeathbang/c.py

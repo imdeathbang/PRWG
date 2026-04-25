@@ -1,4 +1,4 @@
-from src.prwg_imdeathbang.data import *
+from prwg_imdeathbang.data import *
 
 type_dict: dict[str, str] = {
     "string": "const char*"

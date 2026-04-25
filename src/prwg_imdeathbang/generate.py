@@ -1,9 +1,9 @@
 import xml.etree.ElementTree as etree
-from src.prwg_imdeathbang.data import *
+from prwg_imdeathbang.data import *
 import argparse
-import src.prwg_imdeathbang.c as c
+import prwg_imdeathbang.c as c
 
-def parse_params(params: list[etree.Element[str]], registered_languages: dict[str, LanguageData]) -> list[Param]:
+def parse_params(params: list[etree.Element], registered_languages: dict[str, LanguageData]) -> list[Param]:
     parsed: list[Param] = []
     for param in params:
         type = param.get("type")
@@ -12,14 +12,14 @@ def parse_params(params: list[etree.Element[str]], registered_languages: dict[st
         parsed.append(Param(type, name))
     return parsed
 
-def parse_result(result: etree.Element[str] | None) -> Result | None:
+def parse_result(result: etree.Element | None) -> Result | None:
     if result is None:
         return None
     type = result.get("type")
     name = result.get("success")
     return Result(type, name)
 
-def parse_handle_constructor(constructor: etree.Element[str], registered_languages: dict[str, LanguageData]) -> Constructor:
+def parse_handle_constructor(constructor: etree.Element, registered_languages: dict[str, LanguageData]) -> Constructor:
     command = constructor.get("command")
     params = parse_params(constructor.findall("param"), registered_languages)
     options = ConstructorOptions.RETURN_INSTANCE
@@ -33,12 +33,12 @@ def parse_handle_constructor(constructor: etree.Element[str], registered_languag
         options = ConstructorOptions.RETURN_RESULT_OUT_INSTANCE
     return Constructor(command, params, out_name, result, options)
 
-def parse_handle_destructor(destructor: etree.Element[str], registered_languages: dict[str, LanguageData]) -> Destructor:
+def parse_handle_destructor(destructor: etree.Element, registered_languages: dict[str, LanguageData]) -> Destructor:
     name = destructor.get("name")
     params = parse_params(destructor.findall("param"), registered_languages)
     return Destructor(name, params)
 
-def parse_handle_properties(properties: list[etree.Element[str]], registered_languages: dict[str, LanguageData]) -> list[Property]:
+def parse_handle_properties(properties: list[etree.Element], registered_languages: dict[str, LanguageData]) -> list[Property]:
     parsed: list[Property] = []
     for property in properties:
         type = property.get("type")
@@ -49,7 +49,7 @@ def parse_handle_properties(properties: list[etree.Element[str]], registered_lan
         parsed.append(Property(type, name, get_name, set_name))
     return parsed
 
-def parse_handle_commands(commands: list[etree.Element[str]], registered_languages: dict[str, LanguageData]) -> list[Command]:
+def parse_handle_commands(commands: list[etree.Element], registered_languages: dict[str, LanguageData]) -> list[Command]:
     parsed: list[Command] = []
     for command in commands:
         type = command.get("type")
@@ -58,7 +58,7 @@ def parse_handle_commands(commands: list[etree.Element[str]], registered_languag
         parsed.append(Command(type, name, params))
     return parsed
 
-def parse_handle(handle: etree.Element[str], registered_languages: dict[str, LanguageData]) -> Handle:
+def parse_handle(handle: etree.Element, registered_languages: dict[str, LanguageData]) -> Handle:
     type = handle.get("type")
     name = handle.get("name")
     constructor = parse_handle_constructor(handle.find("constructor"), registered_languages)
@@ -67,7 +67,7 @@ def parse_handle(handle: etree.Element[str], registered_languages: dict[str, Lan
     commands = parse_handle_commands(handle.findall("command"), registered_languages)
     return Handle(type, name, constructor, destructor, properties, commands)
 
-def parse_enumerators(enumerators: list[etree.Element[str]]) -> list[Enumerator]:
+def parse_enumerators(enumerators: list[etree.Element]) -> list[Enumerator]:
     parsed: list[Enumerator] = []
     for enumerator in enumerators:
         name = enumerator.get("name")
@@ -75,7 +75,7 @@ def parse_enumerators(enumerators: list[etree.Element[str]]) -> list[Enumerator]
         parsed.append(Enumerator(name, value))
     return parsed
 
-def parse_enum(enum: etree.Element[str]) -> Enum:
+def parse_enum(enum: etree.Element) -> Enum:
     name = enum.get("name")
     enumerators = parse_enumerators(enum.findall("enumerator"))
     return Enum(name, enumerators)
@@ -95,20 +95,21 @@ def build(window_data: InitializeInfo, registered_languages: dict[str, LanguageD
     parsed_data = parse_registry(registry, window_data, language_data.type_dictionary)
     language_data.process_function(parsed_data)
 
-registered_languages: dict[str, LanguageData] = {}
-registered_languages["C"] = LanguageData(c.process_data, c.type_dict)
+def main():
+    registered_languages: dict[str, LanguageData] = {}
+    registered_languages["C"] = LanguageData(c.process_data, c.type_dict)
 
-parser = argparse.ArgumentParser()
-init_info = InitializeInfo()
-parser.add_argument("language")
-parser.add_argument("target_directory")
-parser.add_argument("project_name")
-parser.add_argument("registry_path")
+    parser = argparse.ArgumentParser()
+    init_info = InitializeInfo()
+    parser.add_argument("language")
+    parser.add_argument("target_directory")
+    parser.add_argument("project_name")
+    parser.add_argument("registry_path")
 
-args = parser.parse_args()
-init_info.language = args.language
-init_info.target_directory = args.target_directory
-init_info.project_name = args.project_name
-init_info.registry_path = args.registry_path
+    args = parser.parse_args()
+    init_info.language = args.language
+    init_info.target_directory = args.target_directory
+    init_info.project_name = args.project_name
+    init_info.registry_path = args.registry_path
 
-build(init_info, registered_languages)
+    build(init_info, registered_languages)

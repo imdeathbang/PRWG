@@ -30,6 +30,11 @@ class ConstructorOptions(enum):
     RETURN_RESULT_OUT_INSTANCE = 0
 
 @dataclass
+class Param:
+    type: str
+    name: str
+
+@dataclass
 class Constructor:
     command: str
     params: list[Param]
@@ -48,11 +53,6 @@ class Property:
     name: str
     get_name: str
     set_name: str
-
-@dataclass
-class Param:
-    type: str
-    name: str
 
 @dataclass
 class Command:
