@@ -6,7 +6,7 @@
             <out name="pOutWindow"/>
         </constructor>
         <destructor name="vlDestroyWindow"/>
-        <property type="string" name="title">
+        <property type="int" name="width">
             <get name="vlGetWindowWidth"/>
             <set name="vlSetWindowWidth"/>
         </property>
