@@ -11,6 +11,7 @@ void vlCreateWindow(
     const char* title,
     VlWindow* pOutWindow
 );
+
 void vlDestroyWindow(
     VlWindow window
 );

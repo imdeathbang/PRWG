@@ -2,6 +2,7 @@ import xml.etree.ElementTree as etree
 from prwg_imdeathbang.data import *
 import argparse
 import prwg_imdeathbang.c as c
+import prwg_imdeathbang.csharp as csharp
 
 def parse_params(params: list[etree.Element], registered_languages: dict[str, LanguageData]) -> list[Param]:
     parsed: list[Param] = []
@@ -97,7 +98,8 @@ def build(window_data: InitializeInfo, registered_languages: dict[str, LanguageD
 
 def main():
     registered_languages: dict[str, LanguageData] = {}
-    registered_languages["C"] = LanguageData(c.process_data, c.type_dict)
+    registered_languages["C"] = LanguageData(c.process_data, c.get_type_dict())
+    registered_languages["CSharp"] = LanguageData(csharp.process_data, csharp.get_type_dict())
 
     parser = argparse.ArgumentParser()
     init_info = InitializeInfo()

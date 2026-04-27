@@ -1,9 +1,5 @@
 from prwg_imdeathbang.data import *
 
-type_dict: dict[str, str] = {
-    "string": "const char*"
-}
-
 def get_export_define_data() -> str:
     data: list[str] = []
     data.append("#if defined(_WIN32)")
@@ -129,3 +125,8 @@ def process_data(parsed_data: ParsedData):
     file_data.append(get_end_cpp_data())
     with open(f"{parsed_data.target_directory}/{parsed_data.project_name}.h", "w") as file:
         file.write("\n".join(file_data))
+
+def get_type_dict() -> dict[str, str]:
+    return {
+        "string": "const char*"
+    }
