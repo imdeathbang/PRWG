@@ -1,0 +1,15 @@
+C:\PRWG-1\test\csharp\obj\Debug\net10.0\csharp.GeneratedMSBuildEditorConfig.editorconfig
+C:\PRWG-1\test\csharp\obj\Debug\net10.0\csharp.AssemblyInfoInputs.cache
+C:\PRWG-1\test\csharp\obj\Debug\net10.0\csharp.AssemblyInfo.cs
+C:\PRWG-1\test\csharp\obj\Debug\net10.0\csharp.csproj.CoreCompileInputs.cache
+C:\PRWG-1\test\csharp\obj\Debug\net10.0\csharp.sourcelink.json
+C:\PRWG-1\test\csharp\bin\Debug\net10.0\csharp.exe
+C:\PRWG-1\test\csharp\bin\Debug\net10.0\csharp.deps.json
+C:\PRWG-1\test\csharp\bin\Debug\net10.0\csharp.runtimeconfig.json
+C:\PRWG-1\test\csharp\bin\Debug\net10.0\csharp.dll
+C:\PRWG-1\test\csharp\bin\Debug\net10.0\csharp.pdb
+C:\PRWG-1\test\csharp\obj\Debug\net10.0\csharp.dll
+C:\PRWG-1\test\csharp\obj\Debug\net10.0\refint\csharp.dll
+C:\PRWG-1\test\csharp\obj\Debug\net10.0\csharp.pdb
+C:\PRWG-1\test\csharp\obj\Debug\net10.0\csharp.genruntimeconfig.cache
+C:\PRWG-1\test\csharp\obj\Debug\net10.0\ref\csharp.dll

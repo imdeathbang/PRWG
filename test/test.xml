@@ -1,18 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<registry>
+<registry name="velix">
     <handle type="VlWindow" name="window">
         <constructor command="vlCreateWindow">
             <param type="string" name="title"/>
+            <param type="int" name="width"/>
             <out name="pOutWindow"/>
+            <result type="VlResult" success="VL_SUCCESS"/>
         </constructor>
         <destructor name="vlDestroyWindow"/>
         <property type="int" name="width">
             <get name="vlGetWindowWidth"/>
             <set name="vlSetWindowWidth"/>
         </property>
+        <command type="void" name="vlShowWindow">
+            <param type="bool" name="show"/>
+        </command>
+        <command type="string" name="vlGetPip"/>
     </handle>
-    <enum name="VlResult">
+    <enum type="int" name="VlResult">
         <enumerator name="VL_SUCCESS" value="0"/>
-        <enumerator name="VL_FAIL" value="0"/>
+        <enumerator name="VL_FAIL" value="1"/>
     </enum>
 </registry>

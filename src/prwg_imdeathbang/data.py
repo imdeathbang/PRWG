@@ -6,7 +6,6 @@ class InitializeInfo:
     language: str = None
     target_directory: str = None
     registry_path: str = None
-    project_name: str = None
 
     def is_complete(self) -> bool:
         if not self.language:
@@ -14,8 +13,6 @@ class InitializeInfo:
         if not self.target_directory:
             return False
         if not self.registry_path:
-            return False
-        if not self.project_name:
             return False
         return True
     
@@ -27,7 +24,7 @@ class Result:
 class ConstructorOptions(enum):
     RETURN_INSTANCE = 0
     OUT_INSTANCE = 1
-    RETURN_RESULT_OUT_INSTANCE = 0
+    RETURN_RESULT_OUT_INSTANCE = 2
 
 @dataclass
 class Param:
@@ -76,6 +73,7 @@ class Enumerator:
 
 @dataclass
 class Enum:
+    type: str
     name: str
     enumerators: list[Enumerator]
 

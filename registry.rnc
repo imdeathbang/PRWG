@@ -54,11 +54,13 @@ Enumerator = element enumerator {
 }
 
 Enum = element enum {
+    attribute type { text },
     attribute name { text },
     Enumerator+
 }
 
 element registry {
+    attribute name { text },
     Handle+,
     Enum*
 }
