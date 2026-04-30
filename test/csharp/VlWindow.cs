@@ -22,7 +22,7 @@ public partial class VlWindow {
 
     [UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]
     [LibraryImport("velix", StringMarshalling = StringMarshalling.Utf16)]
-    private static partial string VlGetPip(
+    private static partial string vlGetPip(
         IntPtr window
     );
 
@@ -41,6 +41,11 @@ public partial class VlWindow {
 
     private IntPtr _handle;
 
+    public int Width {
+        get => vlGetWindowWidth(_handle);
+        set => vlSetWindowWidth(_handle, value);
+    }
+
     public VlWindow( 
         string title,
         int width
@@ -51,14 +56,15 @@ public partial class VlWindow {
         }
         _handle = handle;
     }
+
     public void VlShowWindow(
         bool show
     ) {
         vlShowWindow(_handle, show);
     }
-    public string VlGetPip(
 
-    ) {
+    public string VlGetPip() {
         return vlGetPip(_handle);
     }
+
 }

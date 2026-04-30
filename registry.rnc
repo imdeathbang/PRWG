@@ -18,7 +18,7 @@ Constructor = element constructor {
 }
 
 Destructor = element destructor {
-    attribute name { text },
+    attribute command { text },
     Param*
 }
 

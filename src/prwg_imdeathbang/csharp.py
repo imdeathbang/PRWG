@@ -7,6 +7,9 @@ def get_param_marshaling(param: Param) -> str:
     return ""
 
 def get_params_data(params: list[Param], spaces: int = 4, declare: bool = True, connector = ", ", marshal = True) -> str:
+    if not params:
+        return ""
+    
     data: list[str] = []
     if not declare:
         for param in params:
@@ -33,31 +36,32 @@ def get_library_import(library_name, params: list[Param] = [], return_type: str 
         data.append("StringMarshalling = StringMarshalling.Utf16")
     return_marshal = ""
     if return_type == "bool":
-        return_marshal = "\n[return: MarshalAs(UnmanagedType.I1)]"
+        return_marshal = "\n    [return: MarshalAs(UnmanagedType.I1)]"
     call_convention = "[UnmanagedCallConv(CallConvs = new Type[] { typeof(CallConvCdecl) })]\n    "
     return f'{call_convention}[LibraryImport({", ".join(data)})]{return_marshal}'
 
-
-def get_interop_commands_data(library_name: str, handle: Handle) -> str:
+def get_constructor_interop_data(library_name: str, constructor: Constructor) -> str:
     data: list[str] = []
-    constructor = handle.constructor
     data.append(f"    {get_library_import(library_name, constructor.params)}")
     if constructor.options == ConstructorOptions.RETURN_INSTANCE:
         data.append(f"    private static partial IntPtr {constructor.command}(")
         data.append(get_params_data(constructor.params, spaces=8))
     elif constructor.options == ConstructorOptions.RETURN_RESULT_OUT_INSTANCE:
-        result = constructor.result
-        data.append(f"    private static partial {result.type} {constructor.command}(")
+        data.append(f"    private static partial {constructor.result.type} {constructor.command}(")
         params = constructor.params.copy()
         params.append(Param("out IntPtr", "handle"))
         data.append(get_params_data(params, spaces=8))
     else:
-        result = constructor.result
-        data.append(f"    private static partial {result.type} {constructor.command}(")
+        data.append(f"    private static partial {constructor.result.type} {constructor.command}(")
         params = constructor.params.copy()
         params.append(Param("out IntPtr", "handle"))
         data.append(get_params_data(params, spaces=8))
     data.append("    );\n")
+    return "\n".join(data)
+
+def get_interop_commands_data(library_name: str, handle: Handle) -> str:
+    data: list[str] = []
+    data.append(get_constructor_interop_data(library_name, handle.constructor))
     for command in handle.commands:
         data.append(f'    {get_library_import(library_name, command.params, command.type)}')
         data.append(f"    private static partial {command.type} {command.name}(")
@@ -108,7 +112,7 @@ def get_constructor_data(handle: Handle) -> str:
         data.append("        }")
         data.append("        _handle = handle;")
     data.append("    }")
-    return "\n".join(data)
+    return "\n".join(data) + "\n"
 
 def get_members_data(handle: Handle) -> str:
     data: list[str] = []
@@ -129,20 +133,43 @@ def get_enum_data(library_name: str, enum: Enum) -> str:
     data.append("}")
     return "\n".join(data)
 
+def pascal_command_name(name: str) -> str:
+    return name[0].upper() + name[1:]
+
 def get_commands_data(handle: Handle) -> str:
     data: list[str] = []
-
     for command in handle.commands:
-        pascal_name = command.name[0].upper() + command.name[1:]
-        data.append(f"    public {command.type} {pascal_name}(")
-        data.append(get_params_data(command.params, spaces=8, marshal=False))
-        data.append("    ) {")
+        param_data = get_params_data(command.params, spaces=8, marshal=False)
+
+        if param_data:
+            data.append(f"    public {command.type} {pascal_command_name(command.name)}(")
+            data.append(get_params_data(command.params, spaces=8, marshal=False))
+            data.append("    ) {")
+        else:
+            data.append(f"    public {command.type} {pascal_command_name(command.name)}() {{")
         params: list[Param] = [Param("", "_handle")] + command.params
         param_data = get_params_data(params, spaces=0, declare=False)
-        data.append(f"        {command.name}({param_data});")
-        data.append("    }")
 
+        if command.type == "void":
+            data.append(f"        {command.name}({param_data});")
+        else:
+            data.append(f"        return {command.name}({param_data});")
+        data.append("    }\n")
     return "\n".join(data)
+
+def get_property_data(property: Property) -> str:
+    data: list[str] = []
+    data.append(f"    public {property.type} {pascal_command_name(property.name)} {{")
+    data.append(f"        get => {property.get_name}(_handle);")
+    data.append(f"        set => {property.set_name}(_handle, value);")
+    data.append("    }")
+    return "\n".join(data)
+
+def get_properties_data(handle: Handle) -> str:
+    data: list[str] = []
+    for property in handle.properties:
+        data.append(get_property_data(property))
+    return "\n".join(data) + "\n"
 
 def get_handle_data(library_name: str, handle: Handle) -> str:
     data: list[str] = []
@@ -152,10 +179,11 @@ def get_handle_data(library_name: str, handle: Handle) -> str:
     data.append(f"public partial class {handle.type} {{\n")
     data.append(get_interop_commands_data(library_name, handle))
     data.append(get_members_data(handle))
+    data.append(get_properties_data(handle))
     data.append(get_constructor_data(handle))
     data.append(get_commands_data(handle))
     data.append("}")
-    return "\n".join(data)
+    return "\n".join(data) + "\n"
 
 def process_handle(library_name: str, target_directory: str, handle: Handle):
     with open(f"{target_directory}/{handle.type}.cs", "w") as file:

@@ -7,7 +7,7 @@
             <out name="pOutWindow"/>
             <result type="VlResult" success="VL_SUCCESS"/>
         </constructor>
-        <destructor name="vlDestroyWindow"/>
+        <destructor command="vlDestroyWindow"/>
         <property type="int" name="width">
             <get name="vlGetWindowWidth"/>
             <set name="vlSetWindowWidth"/>
@@ -21,4 +21,8 @@
         <enumerator name="VL_SUCCESS" value="0"/>
         <enumerator name="VL_FAIL" value="1"/>
     </enum>
+    <handle type="VlTest" name="test">
+        <constructor command="vlCreateTest"/>
+        <destructor command="vlDestroyTest"/>
+    </handle>
 </registry>

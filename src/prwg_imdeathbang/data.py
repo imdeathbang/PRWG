@@ -41,7 +41,7 @@ class Constructor:
 
 @dataclass
 class Destructor:
-    name: str
+    command: str
     params: list[Param]
 
 @dataclass

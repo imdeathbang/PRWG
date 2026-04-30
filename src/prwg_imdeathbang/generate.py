@@ -35,7 +35,7 @@ def parse_handle_constructor(constructor: etree.Element, type_dict: dict[str, st
     return Constructor(command, params, out_name, result, options)
 
 def parse_handle_destructor(destructor: etree.Element, type_dict: dict[str, str]) -> Destructor:
-    name = destructor.get("name")
+    name = destructor.get("command")
     params = parse_params(destructor.findall("param"), type_dict)
     return Destructor(name, params)
 
