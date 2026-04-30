@@ -16,43 +16,38 @@ def get_handles_define_data(handles: list[Handle]) -> str:
     return "\n".join(data) + "\n"
 
 def get_params_data(params: list[Param]) -> str:
+    if not params:
+        return ""
+
     data: list[str] = []
     for param in params:
         data.append(f"    {param.type} {param.name}")
-    return ",\n".join(data)
+    return "\n" + ",\n".join(data) + "\n"
 
 def get_handle_constructor_data(type: str, constructor: Constructor) -> str:
-    data: list[str] = []
     if constructor.options == ConstructorOptions.RETURN_INSTANCE:
         param_data = get_params_data(constructor.params)
-        data.append(f"APIEXPORT {type} {constructor.command}({param_data});\n")
+        return f"APIEXPORT {type} {constructor.command}({param_data});\n"
     elif constructor.options == ConstructorOptions.RETURN_RESULT_OUT_INSTANCE:
         params = constructor.params.copy() + [Param(type + "*", constructor.out_name)]
         param_data = get_params_data(params)
-        data.append(f"APIEXPORT {constructor.result.type} {constructor.command}({param_data});")
+        return f"APIEXPORT {constructor.result.type} {constructor.command}({param_data});\n"
     else:
-        data.append(f"APIEXPORT void {constructor.command}(")
         params = constructor.params.copy() + [Param(type + "*", constructor.out_name)]
-        data.append(get_params_data(params))
-    data.append(");\n")
-    
-    return "\n".join(data)
+        param_data = get_params_data(params)
+        return f"APIEXPORT void {constructor.command}({param_data});\n"
 
 def get_handle_destructor_data(type: str, name: str, destructor: Destructor) -> str:
-    data: list[str] = []
-    data.append(f"APIEXPORT void {destructor.command}(")
     params = [Param(type, name)] + destructor.params.copy()
-    data.append(get_params_data(params))
-    data.append(");\n")
-    return "\n".join(data)
+    param_data = get_params_data(params)
+    return f"APIEXPORT void {destructor.command}({param_data});\n"
 
 def get_handle_commands_data(type: str, name: str, commands: list[Command]) -> str:
     data: list[str] = []
     for command in commands:
-        data.append(f"APIEXPORT {command.type} {command.name}(")
         params = [Param(type, name)] + command.params.copy()
-        data.append(get_params_data(params))
-        data.append(");\n")
+        param_data = get_params_data(params)
+        data.append(f"APIEXPORT {command.type} {command.name}({param_data});\n")
     return "\n".join(data)
 
 def get_handle_property_commands_data(type: str, name: str, properties: list[Property]) -> str:

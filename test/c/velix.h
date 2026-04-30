@@ -35,7 +35,7 @@ APIEXPORT void vlShowWindow(
     bool show
 );
 
-APIEXPORT string vlGetPip(
+APIEXPORT const char* vlGetPip(
     VlWindow window
 );
 
@@ -48,9 +48,7 @@ APIEXPORT int vlSetWindowWidth(
     int width
 );
 
-APIEXPORT VlTest vlCreateTest(
-
-);
+APIEXPORT VlTest vlCreateTest();
 
 APIEXPORT void vlDestroyTest(
     VlTest test

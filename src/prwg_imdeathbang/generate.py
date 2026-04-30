@@ -54,6 +54,7 @@ def parse_handle_commands(commands: list[etree.Element], type_dict: dict[str, st
     parsed: list[Command] = []
     for command in commands:
         type = command.get("type")
+        type = type_dict.get(type, type)
         name = command.get("name")
         params = parse_params(command.findall("param"), type_dict)
         parsed.append(Command(type, name, params))

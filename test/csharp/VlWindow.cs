@@ -46,7 +46,7 @@ public partial class VlWindow {
         set => vlSetWindowWidth(_handle, value);
     }
 
-    public VlWindow( 
+    public VlWindow(
         string title,
         int width
     ) {
