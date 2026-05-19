@@ -1,8 +1,5 @@
 import xml.etree.ElementTree as etree
-from prwg_imdeathbang.data import *
-import argparse
-import prwg_imdeathbang.c as c
-import prwg_imdeathbang.csharp as csharp
+from prwg.data import *
 
 def parse_params(params: list[etree.Element], type_dict: dict[str, str]) -> list[Param]:
     parsed: list[Param] = []
@@ -77,43 +74,20 @@ def parse_enumerators(enumerators: list[etree.Element]) -> list[Enumerator]:
         parsed.append(Enumerator(name, value))
     return parsed
 
-def parse_enum(enum: etree.Element, type_dict: dict[str, str]) -> Enum:
+def parse_enum(enum: etree.Element, type_dict: dict[str, str]) -> ParsedEnum:
     type = enum.get("type")
     type = type_dict.get(type, type)
     name = enum.get("name")
     enumerators = parse_enumerators(enum.findall("enumerator"))
-    return Enum(type, name, enumerators)
+    return ParsedEnum(type, name, enumerators)
 
 def parse_registry(window_data: InitializeInfo, type_dict: dict[str, str]) -> ParsedData:
     registry = etree.parse(window_data.registry_path)
     project_name = registry.getroot().get("name")
     handles: list[Handle] = []
-    enums: list[Enum] = []
+    enums: list[ParsedEnum] = []
     for handle in registry.findall("handle"):
         handles.append(parse_handle(handle, type_dict))
     for enum in registry.findall("enum"):
         enums.append(parse_enum(enum, type_dict))
     return ParsedData(handles, enums, window_data.target_directory, project_name)
-
-def build(window_data: InitializeInfo, registered_languages: dict[str, LanguageData]):
-    language_data = registered_languages[window_data.language]
-    parsed_data = parse_registry(window_data, language_data.type_dictionary)
-    language_data.process_function(parsed_data)
-
-def main():
-    registered_languages: dict[str, LanguageData] = {}
-    registered_languages["C"] = LanguageData(c.process_data, c.get_type_dict())
-    registered_languages["CSharp"] = LanguageData(csharp.process_data, csharp.get_type_dict())
-
-    parser = argparse.ArgumentParser()
-    init_info = InitializeInfo()
-    parser.add_argument("language")
-    parser.add_argument("target_directory")
-    parser.add_argument("registry_path")
-
-    args = parser.parse_args()
-    init_info.language = args.language
-    init_info.target_directory = args.target_directory
-    init_info.registry_path = args.registry_path
-
-    build(init_info, registered_languages)

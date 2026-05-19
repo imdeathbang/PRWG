@@ -1,11 +1,10 @@
 from dataclasses import dataclass
-from enum import Enum as enum
-from typing import Callable
+from enum import Enum, auto
 
 class InitializeInfo:
-    language: str = None
     target_directory: str = None
     registry_path: str = None
+    language: str = None
 
     def is_complete(self) -> bool:
         if not self.language:
@@ -21,10 +20,10 @@ class Result:
     type: str
     success: str
 
-class ConstructorOptions(enum):
-    RETURN_INSTANCE = 0
-    OUT_INSTANCE = 1
-    RETURN_RESULT_OUT_INSTANCE = 2
+class ConstructorOptions(Enum):
+    RETURN_RESULT_OUT_INSTANCE = auto()
+    RETURN_INSTANCE = auto()
+    OUT_INSTANCE = auto()
 
 @dataclass
 class Param:
@@ -72,7 +71,7 @@ class Enumerator:
     value: str
 
 @dataclass
-class Enum:
+class ParsedEnum:
     type: str
     name: str
     enumerators: list[Enumerator]
@@ -80,11 +79,6 @@ class Enum:
 @dataclass
 class ParsedData:
     handles: list[Handle]
-    enums: list[Enum]
+    enums: list[ParsedEnum]
     target_directory: str
     project_name: str
-
-@dataclass
-class LanguageData:
-    process_function: Callable[[ParsedData], None]
-    type_dictionary: dict[str, str]
