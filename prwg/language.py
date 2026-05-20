@@ -24,3 +24,11 @@ class Language(ABC):
         name of the project or every file will have its own name.
         """
         pass
+
+    @abstractmethod
+    def pre_file(self) -> tuple[list[str], bool]:
+        """
+        Gets a list of information that on every language file and
+        if it should go before the imports or not.
+        """
+        pass
