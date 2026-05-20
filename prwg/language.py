@@ -26,9 +26,17 @@ class Language(ABC):
         pass
 
     @abstractmethod
-    def pre_file(self) -> tuple[list[str], bool]:
+    def pre_file(self) -> tuple[str, bool]:
         """
-        Gets a list of information that on every language file and
+        Gets information that goes on every language file and
         if it should go before the imports or not.
+        """
+        pass
+
+    @abstractmethod
+    def post_file(self) -> str:
+        """
+        Gets information that goes at the end of every
+        language file.
         """
         pass
