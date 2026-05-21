@@ -1,4 +1,16 @@
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
+
+@dataclass
+class LanguageConfig:
+    group_files: bool
+    extension: str
+
+@dataclass
+class FileFixes:
+    post_file_data: list[str]
+    pre_file_data: list[str]
+    before_imports: bool = True
 
 class Language(ABC):
 
@@ -10,33 +22,24 @@ class Language(ABC):
         pass
 
     @abstractmethod
-    def extension(self) -> str:
+    def config(self) -> LanguageConfig:
         """
-        Extension of the language files.
-        (.c, .cs, .py, etc)
-        """
-        pass
-
-    @abstractmethod
-    def group(self) -> bool:
-        """
-        Gets if all the files will group in a single file under the
-        name of the project or every file will have its own name.
+        Gets the configuration set for this language.
         """
         pass
 
     @abstractmethod
-    def pre_file(self) -> tuple[str, bool]:
+    def file_fixes(self) -> FileFixes:
         """
-        Gets information that goes on every language file and
-        if it should go before the imports or not.
+        Gets the pre and post data for each language
+        file. Choose if you need the pre data to go
+        before the imports.
         """
         pass
 
     @abstractmethod
-    def post_file(self) -> str:
+    def imports_data(self, types: set[str]) -> set[str]:
         """
-        Gets information that goes at the end of every
-        language file.
+        Gets the imports data of a file containing the passed
+        types.
         """
-        pass
