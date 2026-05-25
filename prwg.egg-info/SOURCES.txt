@@ -1,0 +1,15 @@
+pyproject.toml
+prwg/cli.py
+prwg/data.py
+prwg/generate.py
+prwg/language.py
+prwg/language_loader.py
+prwg/parser.py
+prwg/parser_two.py
+prwg.egg-info/PKG-INFO
+prwg.egg-info/SOURCES.txt
+prwg.egg-info/dependency_links.txt
+prwg.egg-info/entry_points.txt
+prwg.egg-info/top_level.txt
+prwg/languages/c.py
+prwg/languages/csharp.py
