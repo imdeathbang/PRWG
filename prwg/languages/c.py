@@ -13,10 +13,20 @@ class C(language.Language):
     
     def file_fixes(self):
         pre_file_data = []
-        pre_file_data.append("Somos")
+        pre_file_data.append("#pragma once\n")
+        pre_file_data.append("#ifdef __cplusplus")
+        pre_file_data.append('extern "C" {')
+        pre_file_data.append("#endif\n")
+        pre_file_data.append("#if defined(_WIN32)")
+        pre_file_data.append("    #define APIEXPORT __declspec(dllexport)")
+        pre_file_data.append("#else")
+        pre_file_data.append('    #define APIEXPORT __attribute((visibility("default")))')
+        pre_file_data.append("#endif")
 
         post_file_data = []
-        post_file_data.append("Peru")
+        post_file_data.append("#ifdef __cplusplus")
+        post_file_data.append("}")
+        post_file_data.append("#endif")
 
         return language.FileFixes(
             (pre_file_data, language.FixPosition.BEFORE_IMPORTS),
@@ -28,3 +38,9 @@ class C(language.Language):
         if "bool" in types:
             imports.add("#include <stdbool.h>")
         return imports
+    
+    def handle_container(handle):
+        return None
+    
+    def handle_data(self):
+        return super().handle_data()

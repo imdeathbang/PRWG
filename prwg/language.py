@@ -20,6 +20,16 @@ class FileFixes:
     pre_file: tuple[list[str], FixPosition]
     post_file_data: list[str]
 
+@dataclass
+class Container:
+    declaration: str
+    end: str
+
+@dataclass
+class Handle:
+    type: str
+    name: str
+
 class Language(ABC):
 
     @abstractmethod
@@ -51,3 +61,18 @@ class Language(ABC):
         Gets the imports data of a file containing the passed
         types.
         """
+        pass
+
+    @abstractmethod
+    def handle_container(self, type: str) -> Container | None:
+        """
+        TODO
+        """
+        pass
+
+    @abstractmethod
+    def handle_data(self) -> list[str]:
+        """
+        TODO
+        """
+        pass

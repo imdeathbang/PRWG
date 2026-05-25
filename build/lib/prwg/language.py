@@ -51,3 +51,4 @@ class Language(ABC):
         Gets the imports data of a file containing the passed
         types.
         """
+        pass

@@ -13,10 +13,9 @@ class CSharp(language.Language):
 
     def file_fixes(self):
         pre_file_data = []
-        pre_file_data.append("Somos")
+        pre_file_data.append("namespace velix;")
 
         post_file_data = []
-        pre_file_data.append("Nicaragua")
 
         return language.FileFixes(
             (pre_file_data, language.FixPosition.BEFORE_IMPORTS),
@@ -25,4 +24,6 @@ class CSharp(language.Language):
     
     def imports_data(self, types):
         imports: set[str] = set()
+        imports.add("using System.Runtime.InteropServices;")
+        imports.add("using System.Runtime.CompilerServices;")
         return imports

@@ -1,13 +1,16 @@
 from dataclasses import dataclass
 import xml.etree.ElementTree as etree
 from prwg.language import *
-import prwg.language as language
 from pathlib import Path
 
 @dataclass
-class FileInfo:
+class ModuleInfo:
     imports_data: set[str]
-    data: str
+    data: list[str]
+
+@dataclass
+class FileInfo:
+    modules_info: list[ModuleInfo]
 
 def _get_params_types(params: list[etree.Element]) -> set[str]:
     types: set[str] = set()
@@ -18,9 +21,25 @@ def _get_params_types(params: list[etree.Element]) -> set[str]:
 
     return types
 
-def get_handle_data(handle: etree.Element, language: Language) -> FileInfo:
+def _get_handle_data(handle: etree.Element, language: Language) -> ModuleInfo:
     types: set[str] = set()
     data: list[str] = []
+
+
+    type = handle.get("type")
+    container = language.handle_container(type)
+    prefix = ""
+    if container:
+        data.append(container.declaration)
+        prefix = "\n" * 4
+
+    
+    name = handle.get("name")
+
+    
+    if container:
+        data.append(container.declaration)
+        
 
     constructor = handle.find("constructor")
 
@@ -42,72 +61,72 @@ def get_handle_data(handle: etree.Element, language: Language) -> FileInfo:
         type = command.get("type")
         types |= _get_params_types(command.findall("param"))
 
-    return FileInfo(language.imports_data(types), "\n".join(data))
+    return ModuleInfo(language.imports_data(types), data)
 
-def get_enum_data(enum: etree.Element, language: Language) -> FileInfo:
+def _get_enum_data(enum: etree.Element, language: Language) -> ModuleInfo:
     types: set[str] = set()
     data: list[str] = []
 
     type = enum.get("type")
     types.add(type)
 
-    return FileInfo(language.imports_data(types), "\n".join(data))
+    return ModuleInfo(language.imports_data(types), data)
 
-def _block_connectors(block: list[str]) -> list[str]:
+def _add_block(data: list[str], block: list[str]):
     if block:
-        return block + ["\n"]
-    return block
+        data.append("\n".join(block))
 
-def _process_files_info(files_info: list[FileInfo], language: Language) -> str:
+def _process_module_info(modules_info: list[ModuleInfo], language: Language) -> str:
     imports_data: list[str] = []
-    file_data: list[str] = []
+    module_data: list[str] = []
 
-    for file_info in files_info:
-        if file_info.imports_data:
-            imports_data.extend(file_info.imports_data)
-        file_data.append(file_info.data)
+    for module_info in modules_info:
+        imports_data.extend(module_info.imports_data)
+        module_data.extend(module_info.data)
 
     file_fixes = language.file_fixes()
     pre_file_data, position = file_fixes.pre_file
 
     imports_data = list(set(imports_data))
-    processed_data: list[str] = []
+    data: list[str] = []
 
     if position == FixPosition.BEFORE_IMPORTS:
-        processed_data.extend(_block_connectors(pre_file_data))
-        processed_data.extend(_block_connectors(imports_data))
+        _add_block(data, pre_file_data)
+        _add_block(data, imports_data)
     else:
-        processed_data.extend(_block_connectors(imports_data))
-        processed_data.extend(_block_connectors(pre_file_data))
+        _add_block(data, imports_data)
+        _add_block(data, pre_file_data)
 
-    processed_data.extend(_block_connectors(file_data))
-    processed_data.extend(_block_connectors(file_fixes.post_file_data))
+    _add_block(data, module_data)
+    _add_block(data, file_fixes.post_file_data)
 
-    return "".join(processed_data)
+    return "\n\n".join(data)
 
 def process_registry(registry_path: Path, target_path: Path, language: Language):
     registry = etree.parse(registry_path)
     project_name = registry.getroot().get("name")
 
-    files_info: dict[str, list[FileInfo]] = {}
+    files_info: dict[str, FileInfo] = {}
     config = language.config()
 
     for handle in registry.findall("handle"):
         identifier = project_name
         if config.group_files == GroupFiles.DEDICATED:
-            identifier = handle.get("name")
+            identifier = handle.get("type")
 
-        files_info.setdefault(identifier, []).append(get_handle_data(handle, language))
+        file_info = files_info.setdefault(identifier, FileInfo([]))
+        file_info.modules_info.append(_get_handle_data(handle, language))
 
     for enum in registry.findall("enum"):
         identifier = project_name
         if config.group_files == GroupFiles.DEDICATED:
             identifier = enum.get("name")
 
-        files_info.setdefault(identifier, []).append(get_enum_data(enum, language))
+        file_info = files_info.setdefault(identifier, FileInfo([]))
+        file_info.modules_info.append(_get_enum_data(enum, language))
 
     for identifier, file_info in files_info.items():
         file_path = target_path / f"{identifier}{config.extension}"
 
         with open(file_path, "w") as file:
-            file.write(_process_files_info(file_info, language))
+            file.write(_process_module_info(file_info.modules_info, language))
