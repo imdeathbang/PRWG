@@ -8,7 +8,7 @@ class CSharp(language.Language):
     def config(self):
         return language.FileConfig(
             language.GroupFiles.DEDICATED,
-            ".c"
+            ".cs"
         )
 
     def file_fixes(self):
@@ -27,3 +27,17 @@ class CSharp(language.Language):
         imports.add("using System.Runtime.InteropServices;")
         imports.add("using System.Runtime.CompilerServices;")
         return imports
+    
+    def pepe(self):
+        return language.Pepe(
+            True,
+            "{",
+            "}",
+            ";"
+        )
+    
+    def handle_declaration(self, type):
+        return f"public partial class {type}"
+    
+    def handle_data(self):
+        return super().handle_data()

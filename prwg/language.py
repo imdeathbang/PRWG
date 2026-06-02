@@ -21,14 +21,16 @@ class FileFixes:
     post_file_data: list[str]
 
 @dataclass
-class Container:
-    declaration: str
-    end: str
-
-@dataclass
 class Handle:
     type: str
     name: str
+
+@dataclass
+class Pepe:
+    declaration_enroll: bool
+    code_block_start: str
+    code_block_end: str
+    statement_end: str
 
 class Language(ABC):
 
@@ -64,7 +66,14 @@ class Language(ABC):
         pass
 
     @abstractmethod
-    def handle_container(self, type: str) -> Container | None:
+    def pepe(self) -> Pepe:
+        """
+        TODO
+        """
+        pass
+
+    @abstractmethod
+    def handle_declaration(self, type: str) -> str:
         """
         TODO
         """

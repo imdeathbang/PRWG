@@ -38,3 +38,17 @@ class C(language.Language):
         if "bool" in types:
             imports.add("#include <stdbool.h>")
         return imports
+    
+    def pepe(self):
+        return language.Pepe(
+            False,
+            "{",
+            "}",
+            ";"
+        )
+
+    def handle_declaration(self, type):
+        return f"typedef struct {type}_T* {type}"
+    
+    def handle_data(self):
+        return super().handle_data()

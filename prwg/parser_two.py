@@ -12,6 +12,11 @@ class ModuleInfo:
 class FileInfo:
     modules_info: list[ModuleInfo]
 
+@dataclass
+class ParamInfo:
+    type: str
+    name: str
+
 def _get_params_types(params: list[etree.Element]) -> set[str]:
     types: set[str] = set()
 
@@ -25,22 +30,18 @@ def _get_handle_data(handle: etree.Element, language: Language) -> ModuleInfo:
     types: set[str] = set()
     data: list[str] = []
 
-
     type = handle.get("type")
-    container = language.handle_container(type)
-    prefix = ""
-    if container:
-        data.append(container.declaration)
-        prefix = "\n" * 4
+    pepe = language.pepe()
 
-    
-    name = handle.get("name")
+    declaration = language.handle_declaration(type)
+    spaces = 0
 
-    
-    if container:
-        data.append(container.declaration)
+    if pepe.declaration_enroll:
+        data.append(f"{declaration} {pepe.code_block_start}")
+        spaces = 4
+    else:
+        data.append(f"{declaration}{pepe.statement_end}")
         
-
     constructor = handle.find("constructor")
 
     constructor_params = constructor.findall("param")
@@ -60,6 +61,10 @@ def _get_handle_data(handle: etree.Element, language: Language) -> ModuleInfo:
     for command in commands:
         type = command.get("type")
         types |= _get_params_types(command.findall("param"))
+
+
+    if pepe.declaration_enroll:
+        data.append(f"{pepe.code_block_end}")
 
     return ModuleInfo(language.imports_data(types), data)
 

@@ -12,6 +12,9 @@ extern "C" {
 
 #include <stdbool.h>
 
+typedef struct VlWindow_T* VlWindow;
+typedef struct VlTest_T* VlTest;
+
 #ifdef __cplusplus
 }
 #endif

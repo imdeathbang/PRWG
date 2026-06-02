@@ -12,6 +12,11 @@ class ModuleInfo:
 class FileInfo:
     modules_info: list[ModuleInfo]
 
+@dataclass
+class ParamInfo:
+    type: str
+    name: str
+
 def _get_params_types(params: list[etree.Element]) -> set[str]:
     types: set[str] = set()
 
@@ -26,8 +31,20 @@ def _get_handle_data(handle: etree.Element, language: Language) -> ModuleInfo:
     data: list[str] = []
 
     type = handle.get("type")
-    name = handle.get("name")
+    pepe = language.pepe()
 
+    declaration = language.handle_declaration(type)
+    spaces = 0
+
+    if pepe.declaration_enroll:
+        data.append(f"{declaration} {pepe.code_block_start}")
+        spaces = 4
+    else:
+        data.append(f"{declaration}{pepe.statement_end}")
+
+    #Write thingies
+    # data.append(f"{spaces * " "}{_get_constructor_data(handle.find("constructor"), language)}")
+        
     constructor = handle.find("constructor")
 
     constructor_params = constructor.findall("param")
@@ -47,6 +64,10 @@ def _get_handle_data(handle: etree.Element, language: Language) -> ModuleInfo:
     for command in commands:
         type = command.get("type")
         types |= _get_params_types(command.findall("param"))
+
+
+    if pepe.declaration_enroll:
+        data.append(f"{pepe.code_block_end}")
 
     return ModuleInfo(language.imports_data(types), data)
 
@@ -99,7 +120,7 @@ def process_registry(registry_path: Path, target_path: Path, language: Language)
     for handle in registry.findall("handle"):
         identifier = project_name
         if config.group_files == GroupFiles.DEDICATED:
-            identifier = handle.get("name")
+            identifier = handle.get("type")
 
         file_info = files_info.setdefault(identifier, FileInfo([]))
         file_info.modules_info.append(_get_handle_data(handle, language))
