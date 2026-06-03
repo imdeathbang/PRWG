@@ -8,6 +8,7 @@ from typing import Callable
 class ModuleInfo:
     imports_data: set[str]
     data: list[str]
+    outside_data: list[str]
 
 @dataclass
 class FileInfo:
@@ -111,37 +112,33 @@ def _handle_info(handle: etree.Element) -> HandleInfo:
 
 def _get_handle_data(handle: etree.Element, language: Language) -> ModuleInfo:
     types: set[str] = set()
-    data: list[str] = []
+    outside_data: list[str] = []
 
     type = handle.get("type")
     pepe = language.pepe()
 
     declaration = language.handle_declaration(type)
-    spaces = 0
-
-    if pepe.module_enroll:
-        data.append(f"{declaration} {pepe.code_block_start}")
-        spaces = 4
-    else:
-        data.append(f"{declaration}{pepe.statement_end}")
 
     handle_info = _handle_info(handle)
-    handle_data = language.handle_data(handle_info)
-
-    for row_data in handle_data:
-        data.append(f"{spaces * " "}{row_data}")
-    # if handle_data:
-    #     data.append(f"\n{spaces * " "}".join(handle_data))
+    contents_data: list[str] = language.handle_data(handle_info)
 
     types |= _extract_types(handle_info.constructor_info.params, lambda x: x.type)
     types |= _extract_types(handle_info.destructor_info.params, lambda x: x.type)
     types |= _extract_types(handle_info.properties_info, lambda x: x.type)
     types |= _extract_types(handle_info.commands_info, lambda x: x.type)
 
-    if pepe.module_enroll:
-        data.append(f"{pepe.code_block_end}")
+    if pepe.handle_data_location == DataLocation.OUTSIDE_MODULE:
+        data: list[str] = [f"{declaration}{pepe.statement_end}"]
+        return ModuleInfo(language.imports_data(types), data, contents_data)
+    
+    data: list[str] = []
+    data.append(f"{declaration} {pepe.code_block_start}")
 
-    return ModuleInfo(language.imports_data(types), data)
+    for row_data in contents_data:
+        data.append(f"{4 * " "}{row_data}")
+
+    data.append(f"{pepe.code_block_end}")
+    return ModuleInfo(language.imports_data(types), data, outside_data)
 
 def _get_enum_data(enum: etree.Element, language: Language) -> ModuleInfo:
     types: set[str] = set()
@@ -150,7 +147,7 @@ def _get_enum_data(enum: etree.Element, language: Language) -> ModuleInfo:
     type = enum.get("type")
     types.add(type)
 
-    return ModuleInfo(language.imports_data(types), data)
+    return ModuleInfo(language.imports_data(types), data, [])
 
 def _add_block(data: list[str], block: list[str]):
     if block:
@@ -159,10 +156,12 @@ def _add_block(data: list[str], block: list[str]):
 def _process_module_info(modules_info: list[ModuleInfo], language: Language) -> str:
     imports_data: list[str] = []
     module_data: list[str] = []
+    module_outside_data: list[str] = []
 
     for module_info in modules_info:
         imports_data.extend(module_info.imports_data)
         module_data.extend(module_info.data)
+        module_outside_data.extend(module_info.outside_data)
 
     file_fixes = language.file_fixes()
     pre_file_data, position = file_fixes.pre_file
@@ -178,6 +177,8 @@ def _process_module_info(modules_info: list[ModuleInfo], language: Language) -> 
         _add_block(data, pre_file_data)
 
     _add_block(data, module_data)
+    # _add_block(data, module_outside_data)
+    print(module_outside_data)
     _add_block(data, file_fixes.post_file_data)
 
     return "\n\n".join(data)

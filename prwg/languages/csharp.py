@@ -30,7 +30,8 @@ class CSharp(language.Language):
     
     def pepe(self):
         return language.Pepe(
-            True,
+            language.DataLocation.INSIDE_MODULE,
+            language.DataLocation.INSIDE_MODULE,
             "{",
             "}",
             ";"

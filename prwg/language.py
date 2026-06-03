@@ -6,14 +6,18 @@ class GroupFiles(Enum):
     UNIQUE = auto()
     DEDICATED = auto()
 
+class FixPosition(Enum):
+    BEFORE_IMPORTS = auto()
+    AFTER_IMPORTS = auto()
+
+class DataLocation(Enum):
+    INSIDE_MODULE = auto()
+    OUTSIDE_MODULE = auto()
+
 @dataclass
 class FileConfig:
     group_files: GroupFiles
     extension: str
-
-class FixPosition(Enum):
-    BEFORE_IMPORTS = auto()
-    AFTER_IMPORTS = auto()
 
 @dataclass
 class FileFixes:
@@ -22,7 +26,8 @@ class FileFixes:
 
 @dataclass
 class Pepe:
-    module_enroll: bool
+    handle_data_location: DataLocation
+    enum_data_location: DataLocation
     code_block_start: str
     code_block_end: str
     statement_end: str

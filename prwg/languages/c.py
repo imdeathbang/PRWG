@@ -41,7 +41,8 @@ class C(language.Language):
     
     def pepe(self):
         return language.Pepe(
-            False,
+            language.DataLocation.INSIDE_MODULE,
+            language.DataLocation.INSIDE_MODULE,
             "{",
             "}",
             ";"
