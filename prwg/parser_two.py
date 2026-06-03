@@ -5,10 +5,15 @@ from pathlib import Path
 from typing import Callable
 
 @dataclass
+class InsideData:
+    statement_data: str
+    outside_data: list[str]
+
+@dataclass
 class ModuleInfo:
     imports_data: set[str]
-    data: list[str]
-    outside_data: list[str]
+    inside_data: InsideData | None
+    declaration_data: list[str] | None
 
 @dataclass
 class FileInfo:
@@ -109,10 +114,8 @@ def _handle_info(handle: etree.Element) -> HandleInfo:
 
     return HandleInfo(type, name, constructor_info, destructor_info, properties_info, commands_info)
 
-
 def _get_handle_data(handle: etree.Element, language: Language) -> ModuleInfo:
     types: set[str] = set()
-    outside_data: list[str] = []
 
     type = handle.get("type")
     pepe = language.pepe()
@@ -128,8 +131,8 @@ def _get_handle_data(handle: etree.Element, language: Language) -> ModuleInfo:
     types |= _extract_types(handle_info.commands_info, lambda x: x.type)
 
     if pepe.handle_data_location == DataLocation.OUTSIDE_MODULE:
-        data: list[str] = [f"{declaration}{pepe.statement_end}"]
-        return ModuleInfo(language.imports_data(types), data, contents_data)
+        statement_data = f"{declaration}{pepe.statement_end}"
+        return ModuleInfo(language.imports_data(types), statement_data, [], contents_data)
     
     data: list[str] = []
     data.append(f"{declaration} {pepe.code_block_start}")
@@ -138,7 +141,7 @@ def _get_handle_data(handle: etree.Element, language: Language) -> ModuleInfo:
         data.append(f"{4 * " "}{row_data}")
 
     data.append(f"{pepe.code_block_end}")
-    return ModuleInfo(language.imports_data(types), data, outside_data)
+    return ModuleInfo(language.imports_data(types), "", data, [])
 
 def _get_enum_data(enum: etree.Element, language: Language) -> ModuleInfo:
     types: set[str] = set()
@@ -155,13 +158,23 @@ def _add_block(data: list[str], block: list[str]):
 
 def _process_module_info(modules_info: list[ModuleInfo], language: Language) -> str:
     imports_data: list[str] = []
+
+    outside_data: list[str] = []
+    inside_data: list[str] = []
+
     module_data: list[str] = []
-    module_outside_data: list[str] = []
 
     for module_info in modules_info:
         imports_data.extend(module_info.imports_data)
-        module_data.extend(module_info.data)
-        module_outside_data.extend(module_info.outside_data)
+
+        if module_info.declaration_data:
+            outside_data.extend(module_info.declaration_data.declaration_data)
+
+        if module_info.inside_data:
+            inside_data.extend(module_info.inside_data.outside_data)
+
+        module_data.extend(module_info.statement_data)
+        outside_data.extend(module_info.declaration_data)
 
     file_fixes = language.file_fixes()
     pre_file_data, position = file_fixes.pre_file
@@ -178,7 +191,7 @@ def _process_module_info(modules_info: list[ModuleInfo], language: Language) -> 
 
     _add_block(data, module_data)
     # _add_block(data, module_outside_data)
-    print(module_outside_data)
+    print(outside_data)
     _add_block(data, file_fixes.post_file_data)
 
     return "\n\n".join(data)
