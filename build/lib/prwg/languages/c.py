@@ -41,7 +41,7 @@ class C(language.Language):
     
     def pepe(self):
         return language.Pepe(
-            language.DataLocation.INSIDE_MODULE,
+            language.DataLocation.OUTSIDE_MODULE,
             language.DataLocation.INSIDE_MODULE,
             "{",
             "}",
@@ -51,5 +51,7 @@ class C(language.Language):
     def handle_declaration(self, type):
         return f"typedef struct {type}_T* {type}"
     
-    def handle_data(self, handle_info):
+    def handle_contents(self, handle_info):
+        data: list[str] = []
+
         return ["//Pepe"]

@@ -12,8 +12,9 @@ class InsideData:
 @dataclass
 class ModuleInfo:
     imports_data: set[str]
-    inside_data: InsideData | None
-    declaration_data: list[str] | None
+    statement_data: str | None
+    outside_data: list[str]
+    declaration_data: list[str]
 
 @dataclass
 class FileInfo:
@@ -23,6 +24,18 @@ class FileInfo:
 class ParamInfo:
     type: str
     name: str
+
+def _param_declaration(params: list[ParamInfo], spaces: int, extractor: Callable[[str, str], str]) -> list[str]:
+    param_declaration: list[str] = []
+
+    for index, param in enumerate(params):
+        comma = ","
+        if index == len(params) - 1:
+            comma = ""
+
+        param_declaration.append(f"{" " * spaces}{extractor(param.type, param.name)}{comma}")
+
+    return param_declaration
 
 def _extract_types[T](objects: list[T], extractor: Callable[[T], str]) -> set[str]:
     types: set[str] = set()
@@ -123,7 +136,9 @@ def _get_handle_data(handle: etree.Element, language: Language) -> ModuleInfo:
     declaration = language.handle_declaration(type)
 
     handle_info = _handle_info(handle)
-    contents_data: list[str] = language.handle_data(handle_info)
+    contents_data: list[str] = language.handle_contents(handle_info)
+
+    pre_
 
     types |= _extract_types(handle_info.constructor_info.params, lambda x: x.type)
     types |= _extract_types(handle_info.destructor_info.params, lambda x: x.type)
@@ -132,16 +147,16 @@ def _get_handle_data(handle: etree.Element, language: Language) -> ModuleInfo:
 
     if pepe.handle_data_location == DataLocation.OUTSIDE_MODULE:
         statement_data = f"{declaration}{pepe.statement_end}"
-        return ModuleInfo(language.imports_data(types), statement_data, [], contents_data)
+        return ModuleInfo(language.imports_data(types), statement_data, contents_data, [])
     
-    data: list[str] = []
-    data.append(f"{declaration} {pepe.code_block_start}")
+    declaration_data: list[str] = []
+    declaration_data.append(f"{declaration} {pepe.code_block_start}")
 
     for row_data in contents_data:
-        data.append(f"{4 * " "}{row_data}")
+        declaration_data.append(f"{4 * " "}{row_data}")
 
-    data.append(f"{pepe.code_block_end}")
-    return ModuleInfo(language.imports_data(types), "", data, [])
+    declaration_data.append(f"{pepe.code_block_end}")
+    return ModuleInfo(language.imports_data(types), None, [], declaration_data)
 
 def _get_enum_data(enum: etree.Element, language: Language) -> ModuleInfo:
     types: set[str] = set()
@@ -150,31 +165,28 @@ def _get_enum_data(enum: etree.Element, language: Language) -> ModuleInfo:
     type = enum.get("type")
     types.add(type)
 
-    return ModuleInfo(language.imports_data(types), data, [])
+    return ModuleInfo(language.imports_data(types), None, data, [])
 
-def _add_block(data: list[str], block: list[str]):
+def _add_block(data: list[str], block: list[str], joiner: str = "\n"):
     if block:
-        data.append("\n".join(block))
+        data.append(joiner.join(block))
 
 def _process_module_info(modules_info: list[ModuleInfo], language: Language) -> str:
     imports_data: list[str] = []
 
+    statement_data: list[str] = []
+    declarations_data: list[str] = []
     outside_data: list[str] = []
-    inside_data: list[str] = []
-
-    module_data: list[str] = []
 
     for module_info in modules_info:
+        if declarations_data and module_info.declaration_data:
+            declarations_data.append("")
+        declarations_data.extend(module_info.declaration_data)
+        outside_data.extend(module_info.outside_data)
         imports_data.extend(module_info.imports_data)
 
-        if module_info.declaration_data:
-            outside_data.extend(module_info.declaration_data.declaration_data)
-
-        if module_info.inside_data:
-            inside_data.extend(module_info.inside_data.outside_data)
-
-        module_data.extend(module_info.statement_data)
-        outside_data.extend(module_info.declaration_data)
+        if module_info.statement_data:
+            statement_data.append(module_info.statement_data)
 
     file_fixes = language.file_fixes()
     pre_file_data, position = file_fixes.pre_file
@@ -189,9 +201,9 @@ def _process_module_info(modules_info: list[ModuleInfo], language: Language) -> 
         _add_block(data, imports_data)
         _add_block(data, pre_file_data)
 
-    _add_block(data, module_data)
-    # _add_block(data, module_outside_data)
-    print(outside_data)
+    _add_block(data, statement_data)
+    _add_block(data, declarations_data)
+    _add_block(data, outside_data)
     _add_block(data, file_fixes.post_file_data)
 
     return "\n\n".join(data)

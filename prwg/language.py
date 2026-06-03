@@ -128,7 +128,14 @@ class Language(ABC):
         pass
 
     @abstractmethod
-    def handle_data(self, handle_info: HandleInfo) -> list[str]:
+    def handle_contents(self, handle_info: HandleInfo) -> list[str]:
+        """
+        TODO
+        """
+        pass
+
+    @abstractmethod
+    def handle_constructor(self, handle_type: str, constructor_info: ConstructorInfo) -> str:
         """
         TODO
         """

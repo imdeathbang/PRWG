@@ -11,9 +11,7 @@ extern "C" {
 #endif
 
 typedef struct VlWindow_T* VlWindow;
-typedef struct VlTest_T* VlTest;
 
-//Pepe
 //Pepe
 
 #ifdef __cplusplus
