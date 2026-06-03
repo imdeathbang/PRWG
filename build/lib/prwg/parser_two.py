@@ -2,6 +2,7 @@ from dataclasses import dataclass
 import xml.etree.ElementTree as etree
 from prwg.language import *
 from pathlib import Path
+from typing import Callable
 
 @dataclass
 class ModuleInfo:
@@ -17,14 +18,96 @@ class ParamInfo:
     type: str
     name: str
 
-def _get_params_types(params: list[etree.Element]) -> set[str]:
+def _extract_types[T](objects: list[T], extractor: Callable[[T], str]) -> set[str]:
     types: set[str] = set()
+
+    for object in objects:
+        type = extractor(object)
+        types.add(type)
+    
+    return types
+
+def _params_info(params: list[etree.Element]):
+    params_info: list[ParamInfo] = []
 
     for param in params:
         type = param.get("type")
-        types.add(type)
+        name = param.get("name")
 
-    return types
+        param_info = ParamInfo(type, name)
+        params_info.append(param_info)
+
+    return params_info
+
+def _out_info(constructor: etree.Element | None) -> OutInfo | None:
+    out = constructor.find("out")
+
+    if out is None:
+        return None
+    
+    result = constructor.find("result")
+    name = out.get("name")
+
+    if result is None:
+        return OutInfo(name, None)
+    
+    success = result.get("success")
+    type = result.get("type")
+    result_info = ResultInfo(success, type)
+
+    return OutInfo(name, result_info)
+
+def _constructor_info(constructor: etree.Element) -> ConstructorInfo:
+    command = constructor.get("command")
+    params_info = _params_info(constructor.findall("param"))
+    out_info = _out_info(constructor)
+
+    return ConstructorInfo(command, params_info, out_info)
+
+def _destructor_info(destructor: etree.Element) -> DestructorInfo:
+    command = destructor.get("command")
+    params_info = _params_info(destructor.findall("param"))
+
+    return DestructorInfo(command, params_info)
+
+def _properties_info(properties: list[etree.Element]) -> list[PropertyInfo]:
+    properties_info: list[PropertyInfo] = []
+
+    for property in properties:
+        type = property.get("type")
+        name = property.get("name")
+        get_command_name = property.find("get").get("name")
+        set_command_name = property.find("set").get("name")
+
+        property_info = PropertyInfo(type, name, get_command_name, set_command_name)
+        properties_info.append(property_info)
+
+    return properties_info
+
+def _commands_info(commands: list[etree.Element]) -> list[CommandInfo]:
+    commands_info: list[CommandInfo] = []
+
+    for command in commands:
+        type = command.get("type")
+        name = command.get("name")
+        params_info = _params_info(command.findall("param"))
+
+        command_info = CommandInfo(type, name, params_info)
+        commands_info.append(command_info)
+
+    return commands_info
+
+def _handle_info(handle: etree.Element) -> HandleInfo:
+    type = handle.get("type")
+    name = handle.get("name")
+
+    constructor_info = _constructor_info(handle.find("constructor"))
+    destructor_info = _destructor_info(handle.find("destructor"))
+    properties_info = _properties_info(handle.findall("property"))
+    commands_info = _commands_info(handle.findall("command"))
+
+    return HandleInfo(type, name, constructor_info, destructor_info, properties_info, commands_info)
+
 
 def _get_handle_data(handle: etree.Element, language: Language) -> ModuleInfo:
     types: set[str] = set()
@@ -36,37 +119,26 @@ def _get_handle_data(handle: etree.Element, language: Language) -> ModuleInfo:
     declaration = language.handle_declaration(type)
     spaces = 0
 
-    if pepe.declaration_enroll:
+    if pepe.module_enroll:
         data.append(f"{declaration} {pepe.code_block_start}")
         spaces = 4
     else:
         data.append(f"{declaration}{pepe.statement_end}")
 
-    #Write thingies
-    # data.append(f"{spaces * " "}{_get_constructor_data(handle.find("constructor"), language)}")
-        
-    constructor = handle.find("constructor")
+    handle_info = _handle_info(handle)
+    handle_data = language.handle_data(handle_info)
 
-    constructor_params = constructor.findall("param")
-    types |= _get_params_types(constructor_params)
+    for row_data in handle_data:
+        data.append(f"{spaces * " "}{row_data}")
+    # if handle_data:
+    #     data.append(f"\n{spaces * " "}".join(handle_data))
 
-    destructor = handle.find("destructor")
+    types |= _extract_types(handle_info.constructor_info.params, lambda x: x.type)
+    types |= _extract_types(handle_info.destructor_info.params, lambda x: x.type)
+    types |= _extract_types(handle_info.properties_info, lambda x: x.type)
+    types |= _extract_types(handle_info.commands_info, lambda x: x.type)
 
-    destructor_params = destructor.findall("param")
-    types |= _get_params_types(destructor_params)
-
-    properties = handle.findall("property")
-    for property in properties:
-        type = property.get("type")
-        types.add(type)
-
-    commands = handle.findall("command")
-    for command in commands:
-        type = command.get("type")
-        types |= _get_params_types(command.findall("param"))
-
-
-    if pepe.declaration_enroll:
+    if pepe.module_enroll:
         data.append(f"{pepe.code_block_end}")
 
     return ModuleInfo(language.imports_data(types), data)

@@ -39,5 +39,5 @@ class CSharp(language.Language):
     def handle_declaration(self, type):
         return f"public partial class {type}"
     
-    def handle_data(self):
-        return super().handle_data()
+    def handle_data(self, handle_info):
+        return ["//Pepesillo"]

@@ -21,16 +21,59 @@ class FileFixes:
     post_file_data: list[str]
 
 @dataclass
-class Handle:
-    type: str
-    name: str
-
-@dataclass
 class Pepe:
     declaration_enroll: bool
     code_block_start: str
     code_block_end: str
     statement_end: str
+
+@dataclass
+class ParamInfo:
+    type: str
+    name: str
+
+@dataclass
+class ResultInfo:
+    success: str
+    type: str
+
+@dataclass
+class OutInfo:
+    name: str
+    result_info: ResultInfo | None
+
+@dataclass
+class ConstructorInfo:
+    command: str
+    params: list[ParamInfo]
+    out_info: OutInfo | None
+
+@dataclass
+class DestructorInfo:
+    command: str
+    params: list[ParamInfo]
+
+@dataclass
+class PropertyInfo:
+    type: str
+    name: str
+    get_command_name: str
+    set_command_name: str
+
+@dataclass
+class CommandInfo:
+    type: str
+    name: str
+    params: list[ParamInfo]
+
+@dataclass
+class HandleInfo:
+    type: str
+    name: str
+    constructor_info: ConstructorInfo
+    destructor_info: DestructorInfo
+    properties_info: list[PropertyInfo]
+    commands_info: list[CommandInfo]
 
 class Language(ABC):
 
@@ -80,7 +123,7 @@ class Language(ABC):
         pass
 
     @abstractmethod
-    def handle_data(self) -> list[str]:
+    def handle_data(self, handle_info: HandleInfo) -> list[str]:
         """
         TODO
         """

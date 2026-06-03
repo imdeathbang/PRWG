@@ -10,10 +10,10 @@ extern "C" {
     #define APIEXPORT __attribute((visibility("default")))
 #endif
 
-#include <stdbool.h>
-
 typedef struct VlWindow_T* VlWindow;
+//Pepe
 typedef struct VlTest_T* VlTest;
+//Pepe
 
 #ifdef __cplusplus
 }

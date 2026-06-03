@@ -50,5 +50,5 @@ class C(language.Language):
     def handle_declaration(self, type):
         return f"typedef struct {type}_T* {type}"
     
-    def handle_data(self):
-        return super().handle_data()
+    def handle_data(self, handle_info):
+        return ["//Pepe"]
