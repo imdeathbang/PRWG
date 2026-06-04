@@ -9,7 +9,7 @@
             <param type="string" name="title"/>
             <param type="int" name="width"/>
         </constructor>
-        <destructor command="vlDestroyWindow"/>
+        <destructor/>
         <property type="int" name="width">
             <get name="vlGetWindowWidth"/>
             <set name="vlSetWindowWidth"/>

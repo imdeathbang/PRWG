@@ -48,21 +48,6 @@ class C(language.Language):
             ";"
         )
 
-    def handle_declaration(self, type):
-        return f"typedef struct {type}_T* {type}"
-    
-    def handle_contents(self, handle_info):
-        data: list[str] = []
-
-        return ["//Pepe"]
-    
-    def handle_constructor(self, handle_type, constructor_info):
-        raw_return = "void"
-        if constructor_info.out and constructor_info.result_type:
-            raw_return = constructor_info.result_type
-        # if not constructor_info.out_info:
-        #     return f"APIEXPORT {handle_type}"
-        # if not constructor_info.out_info.result_info:
-        #     #Add to params {handletype}* pOut{HandleName}
-        #     return f"APIEXPORT void"
-        # return f"APIEXPORT {constructor_info.out_info.result_info.type}"
+    def handle_declaration(self, registry_info, handle_name):
+        built_name = f"{registry_info.prefix}{handle_name}"
+        return f"typedef struct {built_name}_T* {built_name}"

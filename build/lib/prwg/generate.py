@@ -5,11 +5,11 @@ from pathlib import Path
 
 def main():
     languages_path = Path(__file__).parent / "languages"
-    languages = language_loader.load_languages(languages_path)
-    cli_info = cli.start_cli(languages)
+    languages = language_loader.instantiate_languages(languages_path)
+    cli_info = cli.start(languages)
 
     parser.process_registry(
         cli_info.registry_path,
         cli_info.target_path,
-        cli_info.language
+        cli_info.language_identifier
     )

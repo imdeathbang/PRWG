@@ -1,5 +1,3 @@
-strictBool = "true" | "false"
-
 Param = element param {
     attribute type { text },
     attribute name { text }
@@ -9,34 +7,9 @@ Constructor = element constructor {
     Param*
 }
 
-Destructor = element destructor {
-    attribute command { text },
-    Param*
-}
-
-Property = element property {
-    attribute type { text },
-    attribute name { text },
-    element get {
-        attribute name { text }
-    },
-    element set {
-        attribute name { text }
-    }
-}
-
-Command = element command {
-    attribute type { text },
-    attribute name { text },
-    Param*
-}
-
 Handle = element handle {
     attribute name { text },
     Constructor,
-    Destructor,
-    Property*,
-    Command*
 }
 
 Enum = element enum {
@@ -56,6 +29,6 @@ element registry {
     attribute namespace { text },
     attribute diminutive { text },
     attribute prefix { text },
-    Result?,
+    Result,
     Handle+
 }
