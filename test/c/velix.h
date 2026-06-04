@@ -14,7 +14,9 @@ typedef struct VlWindow_T* VlWindow;
 typedef struct VlTest_T* VlTest;
 
 //Pepe
+APIEXPORT VlResult vlCreateWindow()
 //Pepe
+APIEXPORT VlTest vlCreateTest()
 
 #ifdef __cplusplus
 }

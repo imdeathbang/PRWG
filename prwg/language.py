@@ -50,8 +50,9 @@ class OutInfo:
 @dataclass
 class ConstructorInfo:
     command: str
+    out: bool
+    result_type: str
     params: list[ParamInfo]
-    out_info: OutInfo | None
 
 @dataclass
 class DestructorInfo:

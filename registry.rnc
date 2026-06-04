@@ -1,20 +1,12 @@
+strictBool = "true" | "false"
+
 Param = element param {
     attribute type { text },
     attribute name { text }
 }
 
 Constructor = element constructor {
-    attribute command { text },
-    Param*,
-    (
-        element out {
-            attribute name { text }
-        },
-        element result {
-            attribute type { text },
-            attribute success { text }
-        }?
-    )?
+    Param*
 }
 
 Destructor = element destructor {
@@ -40,7 +32,6 @@ Command = element command {
 }
 
 Handle = element handle {
-    attribute type { text },
     attribute name { text },
     Constructor,
     Destructor,
@@ -48,19 +39,23 @@ Handle = element handle {
     Command*
 }
 
-Enumerator = element enumerator {
+Enum = element enum {
     attribute name { text },
     attribute value { text }
 }
 
-Enum = element enum {
-    attribute type { text },
-    attribute name { text },
-    Enumerator+
+Result = element result {
+    element success {
+        attribute value { text },
+        attribute name { text }
+    },
+    Enum*
 }
 
 element registry {
-    attribute name { text },
-    Handle+,
-    Enum*
+    attribute namespace { text },
+    attribute diminutive { text },
+    attribute prefix { text },
+    Result?,
+    Handle+
 }

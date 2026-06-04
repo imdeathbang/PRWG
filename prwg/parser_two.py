@@ -58,30 +58,18 @@ def _params_info(params: list[etree.Element]):
 
     return params_info
 
-def _out_info(constructor: etree.Element | None) -> OutInfo | None:
-    out = constructor.find("out")
-
-    if out is None:
-        return None
-    
-    result = constructor.find("result")
-    name = out.get("name")
-
-    if result is None:
-        return OutInfo(name, None)
-    
-    success = result.get("success")
-    type = result.get("type")
-    result_info = ResultInfo(success, type)
-
-    return OutInfo(name, result_info)
+def _constructor_out(raw_out: str) -> bool:
+    if raw_out == "true":
+        return True
+    return False
 
 def _constructor_info(constructor: etree.Element) -> ConstructorInfo:
     command = constructor.get("command")
+    out = _constructor_out(constructor.get("out"))
+    result_type = constructor.get("resultType")
     params_info = _params_info(constructor.findall("param"))
-    out_info = _out_info(constructor)
 
-    return ConstructorInfo(command, params_info, out_info)
+    return ConstructorInfo(command, out, result_type, params_info)
 
 def _destructor_info(destructor: etree.Element) -> DestructorInfo:
     command = destructor.get("command")
@@ -137,8 +125,9 @@ def _get_handle_data(handle: etree.Element, language: Language) -> ModuleInfo:
 
     handle_info = _handle_info(handle)
     contents_data: list[str] = language.handle_contents(handle_info)
+    constructor_data = language.handle_constructor(type, handle_info.constructor_info)
+    contents_data.append(f"{constructor_data} {handle_info.constructor_info.command}()")
 
-    pre_
 
     types |= _extract_types(handle_info.constructor_info.params, lambda x: x.type)
     types |= _extract_types(handle_info.destructor_info.params, lambda x: x.type)

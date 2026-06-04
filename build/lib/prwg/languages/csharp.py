@@ -42,3 +42,6 @@ class CSharp(language.Language):
     
     def handle_contents(self, handle_info):
         return ["//Pepesillo"]
+    
+    def handle_constructor(self, handle_type, constructor_info):
+        return ""

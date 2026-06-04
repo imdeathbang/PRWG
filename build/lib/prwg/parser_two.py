@@ -25,6 +25,18 @@ class ParamInfo:
     type: str
     name: str
 
+def _param_declaration(params: list[ParamInfo], spaces: int, extractor: Callable[[str, str], str]) -> list[str]:
+    param_declaration: list[str] = []
+
+    for index, param in enumerate(params):
+        comma = ","
+        if index == len(params) - 1:
+            comma = ""
+
+        param_declaration.append(f"{" " * spaces}{extractor(param.type, param.name)}{comma}")
+
+    return param_declaration
+
 def _extract_types[T](objects: list[T], extractor: Callable[[T], str]) -> set[str]:
     types: set[str] = set()
 
@@ -124,8 +136,10 @@ def _get_handle_data(handle: etree.Element, language: Language) -> ModuleInfo:
     declaration = language.handle_declaration(type)
 
     handle_info = _handle_info(handle)
-    
     contents_data: list[str] = language.handle_contents(handle_info)
+    constructor_data = language.handle_constructor(type, handle_info.constructor_info)
+    contents_data.append(f"{constructor_data} {handle_info.constructor_info.command}()")
+
 
     types |= _extract_types(handle_info.constructor_info.params, lambda x: x.type)
     types |= _extract_types(handle_info.destructor_info.params, lambda x: x.type)

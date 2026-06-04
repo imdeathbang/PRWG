@@ -57,11 +57,12 @@ class C(language.Language):
         return ["//Pepe"]
     
     def handle_constructor(self, handle_type, constructor_info):
-        if not constructor_info.out_info:
-            return f"APIEXPORT {handle_type}"
-        if not constructor_info.out_info.result_info:
-            #Add to params {handletype}* pOut{HandleName}
-            return f"APIEXPORT void"
-        return f"APIEXPORT {constructor_info.out_info.result_info.type}"
-
-        return f"APIEXPORT {}"
+        raw_return = "void"
+        if constructor_info.out and constructor_info.result_type:
+            raw_return = constructor_info.result_type
+        # if not constructor_info.out_info:
+        #     return f"APIEXPORT {handle_type}"
+        # if not constructor_info.out_info.result_info:
+        #     #Add to params {handletype}* pOut{HandleName}
+        #     return f"APIEXPORT void"
+        # return f"APIEXPORT {constructor_info.out_info.result_info.type}"
