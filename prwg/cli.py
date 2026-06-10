@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-import prwg.language_loader as language_loader
 from prwg.language import Language
 from pathlib import Path
 import argparse
@@ -10,8 +9,7 @@ class CliInfo:
     target_path: Path
     language: str
 
-def start() -> CliInfo:
-    languages = language_loader.instantiate_languages()
+def start(languages: list[Language]) -> CliInfo:
     identifier_language: dict[str, Language] = {}
 
     for language in languages:

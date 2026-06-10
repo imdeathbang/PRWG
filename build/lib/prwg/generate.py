@@ -5,7 +5,7 @@ from pathlib import Path
 
 def main():
     languages_path = Path(__file__).parent / "languages"
-    languages = language_loader.instantiate_languages(languages_path)
+    languages = language_loader.languages(languages_path)
     cli_info = cli.start(languages)
 
     parser.process_registry(

@@ -1,11 +1,11 @@
-import prwg.language_loader as language_loader
-import prwg.language as language
-import prwg.language_parser as parser
+import prwg.loader as loader
+import prwg.parser as parser
 import prwg.cli as cli
 from pathlib import Path
 
 def main():
-    cli_info = cli.start()
+    path = Path(__file__).parent / "languages"
+    cli_info = cli.start(loader.languages(path))
 
     # parser.process_registry(
     #     cli_info.registry_path,

@@ -2,7 +2,7 @@ from prwg.language import Language
 from importlib import util
 from pathlib import Path
 
-def _instantiate_sub_language(path: Path) -> Language | None:
+def _language(path: Path) -> Language | None:
     file_name = path.stem
 
     spec = util.spec_from_file_location(file_name, path)
@@ -17,12 +17,11 @@ def _instantiate_sub_language(path: Path) -> Language | None:
         
     return None
 
-def instantiate_languages() -> list[Language]:
-    folder_path = Path(__file__).parent / "languages"
+def languages(path: Path) -> list[Language]:
     languages: list[Language] = []
 
-    for language_path in folder_path.glob("*.py"):
-        language = _instantiate_sub_language(language_path)
+    for language_path in path.glob("*.py"):
+        language = _language(language_path)
 
         if language is not None:
             languages.append(language)

@@ -1,3 +1,8 @@
+datatypes xsd = "http://www.w3.org/2001/XMLSchema-datatypes"
+
+minus_text = xsd:string { pattern = "[a-z]+" }
+screaming_snake_case = xsd:string { pattern = "[A-Z]+(_[A-Z]+)*" }
+
 Param = element param {
     attribute type { text },
     attribute name { text }
@@ -13,22 +18,21 @@ Handle = element handle {
 }
 
 Enum = element enum {
-    attribute name { text },
-    attribute value { text }
+    attribute value { xsd:integer },
+    attribute name { screaming_snake_case }
 }
 
 Result = element result {
     element success {
-        attribute value { text },
-        attribute name { text }
+        attribute value { xsd:integer },
+        attribute name { screaming_snake_case }
     },
     Enum*
 }
 
 element registry {
-    attribute namespace { text },
-    attribute diminutive { text },
-    attribute prefix { text },
+    attribute namespace { minus_text },
+    attribute diminutive { minus_text },
     Result,
     Handle+
 }
