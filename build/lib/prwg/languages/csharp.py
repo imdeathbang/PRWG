@@ -5,43 +5,17 @@ class CSharp(language.Language):
     def identifier(self):
         return "CSharp"
     
-    def config(self):
-        return language.FileConfig(
-            language.GroupFiles.DEDICATED,
-            ".cs"
-        )
-
-    def file_fixes(self):
-        pre_file_data = []
-        pre_file_data.append("namespace velix;")
-
-        post_file_data = []
-
-        return language.FileFixes(
-            (pre_file_data, language.FixPosition.BEFORE_IMPORTS),
-            post_file_data,
-        )
+    def extension(self):
+        return ".cs"
     
-    def imports_data(self, types):
+    def assemble_file_name(self, words):
+        return "".join([word.capitalize() for word in words])
+    
+    def assemble_module_name(self, words):
+        return "".join([word.capitalize() for word in words])
+    
+    def result_imports(self):
         imports: set[str] = set()
-        imports.add("using System.Runtime.InteropServices;")
-        imports.add("using System.Runtime.CompilerServices;")
+        imports.add("from enum import Enum, auto")
+
         return imports
-    
-    def pepe(self):
-        return language.Pepe(
-            language.DataLocation.INSIDE_MODULE,
-            language.DataLocation.INSIDE_MODULE,
-            "{",
-            "}",
-            ";"
-        )
-    
-    def handle_declaration(self, type):
-        return f"public partial class {type}"
-    
-    def handle_contents(self, handle_info):
-        return ["//Pepesillo"]
-    
-    def handle_constructor(self, handle_type, constructor_info):
-        return ""

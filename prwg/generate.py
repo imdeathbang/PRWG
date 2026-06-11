@@ -7,6 +7,12 @@ def main():
     path = Path(__file__).parent / "languages"
     cli_info = cli.start(loader.languages(path))
 
+    parser.start(
+        cli_info.registry_path,
+        cli_info.target_path,
+        cli_info.language
+    )
+
     # parser.process_registry(
     #     cli_info.registry_path,
     #     cli_info.target_path,
