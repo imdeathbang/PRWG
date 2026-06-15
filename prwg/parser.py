@@ -12,13 +12,13 @@ class RegistryInfo:
 class ModuleInfo:
     imports_data: set[str]
 
-def _assemble_container(pre: str, data: list[str], joiner: str, end: str):
-    result = pre
+def _assemble_container(container: ContainerInfo, data: list[str]):
+    result = container.pre
 
     if data:
-        result += "\n    " + (joiner + "\n    ").join(data)
-    if end:
-        result += end
+        result += "\n    " + (container.joiner + "\n    ").join(data)
+    if container.end:
+        result += container.end
 
     return result
 
@@ -45,7 +45,7 @@ def _result(result: etree.Element, language: Language, registry_info: RegistryIn
 
     module_name = language.assemble_module_name([registry_info.diminutive, "result"])
 
-    container = _assemble_container(language.result_pre(module_name), data, )
+    container = _assemble_container(language.result_container(module_name), data)
 
     imports = language.result_imports()
     return ModuleInfo(imports)

@@ -14,5 +14,15 @@ class C(language.Language):
     def assemble_module_name(self, words):
         return "".join(word.capitalize() for word in words)
     
+    def assemble_enum(self, name, value):
+        return f"{name} {value}"
+    
     def result_imports(self):
         return set()
+    
+    def result_container(self, name):
+        return language.ContainerInfo(
+            f"typedef enum {name} {{",
+            ",",
+            f"}} {name}"
+        )

@@ -41,10 +41,6 @@ class Language(ABC):
         pass
 
     @abstractmethod
-    def result_pre(self, name: str) -> str:
-        pass
-
-    @abstractmethod
     def result_container(self, name: str) -> ContainerInfo:
         pass
 

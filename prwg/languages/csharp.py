@@ -20,13 +20,10 @@ class CSharp(language.Language):
     def result_imports(self):
         return set()
     
-    def result_pre(self, name):
-        return f"public enum {name} : int {{"
-    
     def result_container(self, name):
-        pre = f"public enum {name} : int {{"
-        joiner = ","
-        end = "}"
-
-        return language.ContainerInfo()
+        return language.ContainerInfo(
+            f"public enum {name} : int {{",
+            ",",
+            "}"
+        )
     
